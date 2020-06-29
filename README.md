@@ -1,2 +1,2 @@
 # BARobots
-Blazor App C# clone of JRobots and CRobots
+Blazor App NetCore C# clone of JRobots and CRobots
