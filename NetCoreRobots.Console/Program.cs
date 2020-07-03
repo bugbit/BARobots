@@ -9,6 +9,7 @@ namespace NetCoreRobots.Console
     {
         const int StatusBoxesWitdh = 20;
         const int SepFieldStatusBoxesWitdh = 3;
+        readonly static CoSize PanelRobot = new CoSize { w = StatusBoxesWitdh + SepFieldStatusBoxesWitdh, h = 5 };
 
         static CoSize WindowS;
         static CoRect ArenaR;

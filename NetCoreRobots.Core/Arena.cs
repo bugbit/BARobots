@@ -2,7 +2,8 @@
 
 namespace NetCoreRobots.Core
 {
-    public class Class1
+    public class Arena
     {
+        public const int MaxRobots = 8;
     }
 }
