@@ -3,11 +3,13 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30204.135
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BARobots", "BARobots\BARobots.csproj", "{9BEB9813-3E4F-4729-A0EA-3AD6BD28B016}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BARobots", "BARobots\BARobots.csproj", "{9BEB9813-3E4F-4729-A0EA-3AD6BD28B016}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetCoreRobots.Console", "NetCoreRobots.Console\NetCoreRobots.Console.csproj", "{5C939749-B0A5-4B23-A136-B6055EE28F77}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetCoreRobots.Console", "NetCoreRobots.Console\NetCoreRobots.Console.csproj", "{5C939749-B0A5-4B23-A136-B6055EE28F77}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetCoreRobots.Core", "NetCoreRobots.Core\NetCoreRobots.Core.csproj", "{E7B55142-859D-4C45-8965-37DB78346E74}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "NetCoreRobots.Core", "NetCoreRobots.Core\NetCoreRobots.Core.csproj", "{E7B55142-859D-4C45-8965-37DB78346E74}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetCoreRobots.Sdk", "NetCoreRobots.Sdk\NetCoreRobots.Sdk.csproj", "{67A43861-1C6A-4786-96FA-3DEB0065CEBF}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,6 +29,10 @@ Global
 		{E7B55142-859D-4C45-8965-37DB78346E74}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{E7B55142-859D-4C45-8965-37DB78346E74}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{E7B55142-859D-4C45-8965-37DB78346E74}.Release|Any CPU.Build.0 = Release|Any CPU
+		{67A43861-1C6A-4786-96FA-3DEB0065CEBF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{67A43861-1C6A-4786-96FA-3DEB0065CEBF}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{67A43861-1C6A-4786-96FA-3DEB0065CEBF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{67A43861-1C6A-4786-96FA-3DEB0065CEBF}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
