@@ -29,29 +29,12 @@ SOFTWARE.
 
 using System;
 using System.Collections.Generic;
-using System.Net.Mail;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace NetCoreRobots.Core
+namespace NetCoreRobots.Core.Robots
 {
-    public sealed class Robot
+    [AttributeUsage(AttributeTargets.Class)]
+    public class RobotScriptClassAttribute : Attribute
     {
-        private Func<Task> mMain;
-        private Task mTaskMain;
-
-        public string Name { get; set; }
-        public CancellationToken CancelToken { get; set; }
-        public double LocX { get; set; }
-        public double LocY { get; set; }
-
-        public Robot(string argName, Func<Task> argMain)
-        {
-            Name = argName;
-            mMain = argMain;
-        }
-
-        public Robot(string argName, Action argMain) : this(argName, () => Task.Run(argMain)) { }
     }
 }

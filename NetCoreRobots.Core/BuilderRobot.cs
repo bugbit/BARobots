@@ -29,29 +29,39 @@ SOFTWARE.
 
 using System;
 using System.Collections.Generic;
-using System.Net.Mail;
+using System.Reflection;
 using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace NetCoreRobots.Core
 {
-    public sealed class Robot
+    public class BuilderRobot
     {
-        private Func<Task> mMain;
-        private Task mTaskMain;
+        protected Type mRobotClassType;
 
-        public string Name { get; set; }
-        public CancellationToken CancelToken { get; set; }
-        public double LocX { get; set; }
-        public double LocY { get; set; }
+        public virtual void Compile() { }
 
-        public Robot(string argName, Func<Task> argMain)
+        public virtual Robot Create()
         {
-            Name = argName;
-            mMain = argMain;
-        }
+            Compile();
 
-        public Robot(string argName, Action argMain) : this(argName, () => Task.Run(argMain)) { }
+            if (mRobotClassType == null)
+                throw new NullReferenceException($"{nameof(mRobotClassType)} is null");
+
+            var pMethod = mRobotClassType.GetMethod("main", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+
+            if (pMethod == null)
+                throw new InvalidOperationException($"{mRobotClassType.Name} no define main method");
+
+            if (pMethod.GetParameters().Length == 0)
+            {
+                if (pMethod.DeclaringType == typeof(void))
+                    return new Robot(mRobotClassType.Name, (Action)Action.CreateDelegate(typeof(Action), pMethod));
+                if (pMethod.DeclaringType == typeof(Task))
+                    return new Robot(mRobotClassType.Name, (Func<Task>)Func<Task>.CreateDelegate(typeof(Func<Task>), pMethod));
+            }
+
+            throw new InvalidCastException($"{pMethod} no define method void main() or Task main()");
+        }
     }
 }
