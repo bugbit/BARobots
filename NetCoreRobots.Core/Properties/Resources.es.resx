@@ -121,7 +121,7 @@
     <value>no encuentro el robot '{0}'</value>
   </data>
   <data name="NoMainMethodFound" xml:space="preserve">
-    <value>El robot '{0}' no se implementado el metodo main</value>
+    <value>El robot '{0}' no se ha implementado el metodo main</value>
   </data>
   <data name="More1MainMethod" xml:space="preserve">
     <value>El robot '{0}' tienes más de un método main</value>

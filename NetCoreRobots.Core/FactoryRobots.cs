@@ -52,7 +52,7 @@ namespace NetCoreRobots.Core
         {
             var pQuery =
                 from t in argAssembly.GetTypes()
-                where t.IsAssignableFrom(typeof(CSRobot))
+                where t.IsSubclassOf(typeof(CSRobot))
                 let a = t.GetCustomAttribute<RobotScriptClassAttribute>()
                 where a != null
                 select new { t.Name, t };

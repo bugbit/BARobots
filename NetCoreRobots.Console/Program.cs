@@ -27,6 +27,7 @@ SOFTWARE.
 
 #endregion
 
+using NetCoreRobots.Core;
 using System;
 using System.Text;
 using static System.Console;
@@ -38,6 +39,9 @@ namespace NetCoreRobots.Console
     {
         const int StatusBoxesWitdh = 20;
         const int SepFieldStatusBoxesWitdh = 3;
+
+        static Arena mArena = new Arena();
+
         readonly static CoSize PanelRobot = new CoSize { w = StatusBoxesWitdh + SepFieldStatusBoxesWitdh, h = 5 };
 
         static CoSize WindowS;
@@ -49,13 +53,17 @@ namespace NetCoreRobots.Console
 
         static void Main(string[] args)
         {
+            mArena.FactoryRobots = new FactoryRobots();
+            mArena.InitRobotsToMatchSolo("RobotTest1");
             InitScreen();
+            DisplayScreen();
+            mArena.StartMatch().RunSynchronously();
             //OutputEncoding = Encoding.GetEncoding(28591);
 
             //for (var i = 0; i < 512; i++)
             //    Write($"{i} = {(char)i}\t");
 
-            DisplayScreen();
+
             ReadLine();
         }
 

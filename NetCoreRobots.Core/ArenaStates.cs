@@ -29,29 +29,20 @@ SOFTWARE.
 
 using System;
 using System.Collections.Generic;
-using System.Net.Mail;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace NetCoreRobots.Core
 {
-    public sealed class RobotInfo
+    public enum ArenaStates
     {
-        public string Name { get; set; }
-        public int? IdTeam { get; set; }
-        public int? IdMemberTeam { get; set; }
-        public Func<Task> Main { get; set; }
-        public CancellationTokenSource CancelToken { get; set; }
-        public double LocX { get; set; }
-        public double LocY { get; set; }
-
-        //public RobotInfo(string argName, Func<Task> argMain)
-        //{
-        //    Name = argName;
-        //    mMain = argMain;
-        //}
-
-        //public RobotInfo(string argName, Action argMain) : this(argName, () => Task.Run(argMain)) { }
+        Created,
+        Initialized,
+        Starting,
+        Running,
+        Timeout,
+        Draw,
+        Winner,
+        Stopped,
+        Error,
     }
 }
