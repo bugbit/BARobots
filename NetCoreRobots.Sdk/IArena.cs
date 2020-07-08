@@ -34,10 +34,10 @@ using System.Threading;
 
 namespace NetCoreRobots.Sdk
 {
-    public interface IRobot
+    public interface IArena
     {
-        CancellationToken CancelToken { get; }
-        double LocX { get; }
-        double LocY { get; }
+        //CancellationToken CancelToken { get; }
+        //double LocX { get; }
+        //double LocY { get; }
     }
 }

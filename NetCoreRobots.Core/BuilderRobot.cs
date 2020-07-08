@@ -37,31 +37,31 @@ namespace NetCoreRobots.Core
 {
     public class BuilderRobot
     {
-        protected Type mRobotClassType;
+        //protected Type mRobotClassType;
 
-        public virtual void Compile() { }
+        //public virtual void Compile() { }
 
-        public virtual Robot Create()
-        {
-            Compile();
+        //public virtual Robot Create()
+        //{
+        //    Compile();
 
-            if (mRobotClassType == null)
-                throw new NullReferenceException($"{nameof(mRobotClassType)} is null");
+        //    if (mRobotClassType == null)
+        //        throw new NullReferenceException($"{nameof(mRobotClassType)} is null");
 
-            var pMethod = mRobotClassType.GetMethod("main", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
+        //    var pMethod = mRobotClassType.GetMethod("main", BindingFlags.Public | BindingFlags.NonPublic | BindingFlags.Instance);
 
-            if (pMethod == null)
-                throw new InvalidOperationException($"{mRobotClassType.Name} no define main method");
+        //    if (pMethod == null)
+        //        throw new InvalidOperationException($"{mRobotClassType.Name} no define main method");
 
-            if (pMethod.GetParameters().Length == 0)
-            {
-                if (pMethod.DeclaringType == typeof(void))
-                    return new Robot(mRobotClassType.Name, (Action)Action.CreateDelegate(typeof(Action), pMethod));
-                if (pMethod.DeclaringType == typeof(Task))
-                    return new Robot(mRobotClassType.Name, (Func<Task>)Func<Task>.CreateDelegate(typeof(Func<Task>), pMethod));
-            }
+        //    if (pMethod.GetParameters().Length == 0)
+        //    {
+        //        if (pMethod.DeclaringType == typeof(void))
+        //            return new Robot(mRobotClassType.Name, (Action)Action.CreateDelegate(typeof(Action), pMethod));
+        //        if (pMethod.DeclaringType == typeof(Task))
+        //            return new Robot(mRobotClassType.Name, (Func<Task>)Func<Task>.CreateDelegate(typeof(Func<Task>), pMethod));
+        //    }
 
-            throw new InvalidCastException($"{pMethod} no define method void main() or Task main()");
-        }
+        //    throw new InvalidCastException($"{pMethod} no define method void main() or Task main()");
+        //}
     }
 }

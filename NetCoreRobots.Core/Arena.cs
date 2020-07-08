@@ -28,11 +28,43 @@ SOFTWARE.
 #endregion
 
 using System;
+using System.Collections.Generic;
+using System.Threading;
+using NetCoreRobots.Sdk;
 
 namespace NetCoreRobots.Core
 {
-    public class Arena
+    public class Arena : IArena
     {
         public const int MaxRobots = 8;
+
+        private CancellationTokenSource mCancelToken = new CancellationTokenSource();
+        private List<RobotInfo> mRobots = new List<RobotInfo>();
+
+        public FactoryRobots FactoryRobots { get; set; }
+
+        public bool AddRobot(string argName)
+        {
+            var pRobot = FactoryRobots.Create(argName);
+
+            if (pRobot.Item1 == null || pRobot.Item2 == null)
+                return false;
+
+            lock (mRobots)
+            {
+                var pId = mRobots.Count;
+                var pInfo = new RobotInfo
+                {
+                    Name = argName,
+                    Main = pRobot.Item2,
+                    CancelToken = CancellationTokenSource.CreateLinkedTokenSource(mCancelToken.Token)
+                };
+
+                ((IInitCSRobot)pRobot.Item1).Init(pId, this);
+                mRobots.Add(pInfo);
+            }
+
+            return true;
+        }
     }
 }

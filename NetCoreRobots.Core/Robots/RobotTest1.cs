@@ -30,19 +30,20 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading.Tasks;
 using NetCoreRobots.Sdk;
 
 namespace NetCoreRobots.Core.Robots
 {
     [RobotScriptClass]
-    public class RobotTest1 : RobotScript
+    public class RobotTest1 : CSRobot
     {
-        public RobotTest1(IRobot argRobot) : base(argRobot)
-        {
-        }
+        //void main()
+        //{
+        //}
+        //async Task main()
+        //{
 
-        void main()
-        {
-        }
+        //}
     }
 }

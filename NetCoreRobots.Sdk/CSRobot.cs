@@ -29,29 +29,35 @@ SOFTWARE.
 
 using System;
 using System.Collections.Generic;
-using System.Net.Mail;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
 
-namespace NetCoreRobots.Core
+namespace NetCoreRobots.Sdk
 {
-    public sealed class Robot
+    public class CSRobot : IInitCSRobot
     {
-        private Func<Task> mMain;
-        private Task mTaskMain;
+        private int mId;
+        private IArena mArena;
 
-        public string Name { get; set; }
-        public CancellationToken CancelToken { get; set; }
-        public double LocX { get; set; }
-        public double LocY { get; set; }
+        public override int GetHashCode() => mId.GetHashCode();
 
-        public Robot(string argName, Func<Task> argMain)
+        //protected int loc_x()
+        //{
+        //    mArena.CancelToken.ThrowIfCancellationRequested();
+
+        //    return (int)mArena.LocX;
+        //}
+
+        //protected int loc_y()
+        //{
+        //    mArena.CancelToken.ThrowIfCancellationRequested();
+
+        //    return (int)mArena.LocY;
+        //}
+
+        void IInitCSRobot.Init(int argId, IArena argArena)
         {
-            Name = argName;
-            mMain = argMain;
+            mId = argId;
+            mArena = argArena;
         }
-
-        public Robot(string argName, Action argMain) : this(argName, () => Task.Run(argMain)) { }
     }
 }
