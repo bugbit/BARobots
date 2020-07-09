@@ -61,7 +61,7 @@ namespace NetCoreRobots.Core.Properties {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a The robot main method &apos;{0}&apos; is wrong, it has to be void main () or Task main ()!.
+        ///   Busca una cadena traducida similar a The robot main method &apos;{0}&apos; is wrong, it has to be void main () or Task main ().
         /// </summary>
         internal static string MainMethodIncorrect {
             get {
@@ -70,7 +70,7 @@ namespace NetCoreRobots.Core.Properties {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a Robot {&apos;0&apos;} has more than one main method!.
+        ///   Busca una cadena traducida similar a Robot &apos;{0}&apos; has more than one main method.
         /// </summary>
         internal static string More1MainMethod {
             get {
@@ -79,7 +79,7 @@ namespace NetCoreRobots.Core.Properties {
         }
         
         /// <summary>
-        ///   Busca una cadena traducida similar a The robot &apos;{0}&apos; did not implement the main method!.
+        ///   Busca una cadena traducida similar a The robot &apos;{0}&apos; did not implement the main method.
         /// </summary>
         internal static string NoMainMethodFound {
             get {

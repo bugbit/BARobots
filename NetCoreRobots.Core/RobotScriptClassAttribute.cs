@@ -31,7 +31,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NetCoreRobots.Core.Robots
+namespace NetCoreRobots.Core
 {
     [AttributeUsage(AttributeTargets.Class)]
     public class RobotScriptClassAttribute : Attribute

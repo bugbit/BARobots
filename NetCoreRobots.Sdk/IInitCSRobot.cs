@@ -7,5 +7,6 @@ namespace NetCoreRobots.Sdk
     public interface IInitCSRobot
     {
         void Init(int argId, IArena argArena);
+        void DeInit();
     }
 }

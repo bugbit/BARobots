@@ -31,11 +31,13 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading;
+using System.Threading.Tasks;
 
 namespace NetCoreRobots.Sdk
 {
     public interface IArena
     {
+        Task<double> loc_x(int argIdRobot);
         //CancellationToken CancelToken { get; }
         //double LocX { get; }
         //double LocY { get; }

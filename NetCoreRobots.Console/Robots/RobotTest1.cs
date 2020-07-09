@@ -31,9 +31,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Threading.Tasks;
+using NetCoreRobots.Core;
 using NetCoreRobots.Sdk;
 
-namespace NetCoreRobots.Core.Robots
+namespace NetCoreRobots.Console.Robots
 {
     [RobotScriptClass]
     public class RobotTest1 : CSRobot

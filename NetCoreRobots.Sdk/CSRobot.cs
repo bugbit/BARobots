@@ -30,6 +30,8 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace NetCoreRobots.Sdk
 {
@@ -38,7 +40,28 @@ namespace NetCoreRobots.Sdk
         private int mId;
         private IArena mArena;
 
-        public override int GetHashCode() => mId.GetHashCode();
+        protected static T RunSynchronously<T>(Task<T> argTask)
+        {
+            var pEvent = new AutoResetEvent(false);
+            var pAwaiter = argTask.ConfigureAwait(true).GetAwaiter();
+
+            pAwaiter.OnCompleted(() => pEvent.Set());
+
+            pEvent.WaitOne();
+
+            return pAwaiter.GetResult();
+        }
+
+
+        protected async Task<int> loc_x_async()
+        {
+            if (mArena == null)
+                throw new TaskCanceledException();
+
+            return (int)await mArena.loc_x(mId);
+        }
+
+        protected int loc_x() => RunSynchronously(loc_x_async());
 
         //protected int loc_x()
         //{
@@ -58,6 +81,11 @@ namespace NetCoreRobots.Sdk
         {
             mId = argId;
             mArena = argArena;
+        }
+
+        void IInitCSRobot.DeInit()
+        {
+            mArena = null;
         }
     }
 }

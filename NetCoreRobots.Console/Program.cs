@@ -54,7 +54,8 @@ namespace NetCoreRobots.Console
         static void Main(string[] args)
         {
             mArena.FactoryRobots = new FactoryRobots();
-            mArena.InitRobotsToMatchSolo("RobotTest1");
+            mArena.CrearRobotsToMatchSolo("RobotTest1");
+            mArena.InitMatch();
             InitScreen();
             DisplayScreen();
             mArena.StartMatch().RunSynchronously();

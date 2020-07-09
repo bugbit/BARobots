@@ -101,12 +101,12 @@
     <value>i can't find the robot '{0}'</value>
   </data>
   <data name="NoMainMethodFound" xml:space="preserve">
-    <value>The robot '{0}' did not implement the main method!</value>
+    <value>The robot '{0}' did not implement the main method</value>
   </data>
   <data name="More1MainMethod" xml:space="preserve">
-    <value>Robot {'0'} has more than one main method!</value>
+    <value>Robot '{0}' has more than one main method</value>
   </data>
   <data name="MainMethodIncorrect" xml:space="preserve">
-    <value>The robot main method '{0}' is wrong, it has to be void main () or Task main ()!</value>
+    <value>The robot main method '{0}' is wrong, it has to be void main () or Task main ()</value>
   </data>
 </root>

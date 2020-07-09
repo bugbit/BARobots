@@ -53,11 +53,17 @@ namespace NetCoreRobots.Core
         public void AddRobot(string argName) => mRobotsToMatch.Add((1, argName));
 
 
-        public void InitRobotsToMatchSolo(string argName)
+        public void CrearRobotsToMatchSolo(string argName)
         {
             MatchType = MatchTypes.Solo;
             mRobotsToMatch.Clear();
             AddRobot(argName);
+        }
+
+        public void InitMatch()
+        {
+            InitMatchRobots();
+            State = ArenaStates.Initialized;
         }
 
         public async Task StartMatch()
@@ -67,20 +73,25 @@ namespace NetCoreRobots.Core
 
             mMatchCancelToken = new CancellationTokenSource();
 
-            InitMatch();
+            if (State != ArenaStates.Initialized)
+                InitMatch();
 
-            var pTasks = new List<Task>(from r in mRobots select r.Main.Invoke());
+            foreach (var pTask in mRobots)
+                pTask.Main.Invoke();
 
-            pTasks.Add(LoopMain());
-
-            await Task.WhenAll(pTasks);
+            await LoopMain();
 
             mMatchCancelToken = null;
         }
 
-        private void InitMatch()
+        async Task<double> IArena.loc_x(int argIdRobot)
         {
-            InitMatchRobots();
+            if (argIdRobot >= mRobots.Count)
+                throw new ArgumentOutOfRangeException();
+
+            await Task.Yield();
+
+            return mRobots[argIdRobot].LocX;
         }
 
         private void InitMatchRobots()
@@ -126,13 +137,27 @@ namespace NetCoreRobots.Core
         {
             var pToken = mMatchCancelToken.Token;
 
-            for (; ; )
+            State = ArenaStates.Running;
+            try
             {
-                if (Display != null)
-                    await Display.Invoke();
-                if (pToken.IsCancellationRequested)
-                    break;
+                for (; ; )
+                {
+                    if (Display != null)
+                        await Display.Invoke();
+                    if (pToken.IsCancellationRequested)
+                        break;
+                }
             }
+            finally
+            {
+                StopMatch();
+                State = ArenaStates.Stopped;
+            }
+        }
+
+        private void StopMatch()
+        {
+            mMatchCancelToken.Cancel();
         }
     }
 }

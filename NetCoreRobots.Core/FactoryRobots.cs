@@ -33,19 +33,19 @@ using System.Linq;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
-using NetCoreRobots.Core.Robots;
 using NetCoreRobots.Sdk;
 
 namespace NetCoreRobots.Core
 {
     public class FactoryRobots
     {
-        private Dictionary<string, Type> mCache = new Dictionary<string, Type>();
+        private Dictionary<string, (Type, Func<Task>)> mCache = new Dictionary<string, (Type, Func<Task>)>();
         private Dictionary<string, Type> mClassType = new Dictionary<string, Type>();
 
-        public FactoryRobots()
+        public FactoryRobots(params Assembly[] argAssemblies)
         {
             AddRobotClassAssemblty(typeof(RobotScriptClassAttribute).Assembly);
+            AddRobotsClassAssemblties(argAssemblies);
         }
 
         public void AddRobotClassAssemblty(Assembly argAssembly)
@@ -61,14 +61,29 @@ namespace NetCoreRobots.Core
                 mClassType[t.Name] = t.t;
         }
 
+        public void AddRobotsClassAssemblties(params Assembly[] argAssemblies)
+        {
+            foreach (var pAssembly in argAssemblies)
+                AddRobotClassAssemblty(pAssembly);
+        }
+
         public (CSRobot, Func<Task>) Create(string argName)
         {
-            if (!mCache.TryGetValue(argName, out Type pType))
-            {
-                if (!mClassType.TryGetValue(argName, out pType))
-                {
+            var pRobotTypeAndMain = GetRobotTypeAndMain(argName);
+            var pRobot = Activator.CreateInstance(pRobotTypeAndMain.Item1);
 
-                }
+
+            return ((CSRobot)pRobot, pRobotTypeAndMain.Item2);
+        }
+
+        private (Type, Func<Task>) GetRobotTypeAndMain(string argName)
+        {
+            if (mCache.TryGetValue(argName, out (Type, Func<Task>) pRobot))
+                return pRobot;
+
+            if (!mClassType.TryGetValue(argName, out Type pType))
+            {
+                // robots compile
             }
 
             if (pType == null)
@@ -91,10 +106,11 @@ namespace NetCoreRobots.Core
                 (pMainMethod.ReturnType == typeof(void))
                     ? () => Task.Run((Action)Delegate.CreateDelegate(typeof(Action), pMainMethod))
                     : (Func<Task>)Delegate.CreateDelegate(typeof(Func<Task>), pMainMethod);
-            var pRobot = Activator.CreateInstance(pType);
+            var pRobotTypeAndMain = (pType, pMain);
 
+            mCache[argName] = pRobotTypeAndMain;
 
-            return ((CSRobot)pRobot, pMain);
+            return pRobotTypeAndMain;
         }
     }
 }
