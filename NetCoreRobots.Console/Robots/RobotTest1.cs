@@ -39,9 +39,9 @@ namespace NetCoreRobots.Console.Robots
     [RobotScriptClass]
     public class RobotTest1 : CSRobot
     {
-        //void main()
-        //{
-        //}
+        void main()
+        {
+        }
         //async Task main()
         //{
 

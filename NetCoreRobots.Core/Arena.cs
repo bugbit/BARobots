@@ -50,7 +50,26 @@ namespace NetCoreRobots.Core
         public Func<Task> Display { get; set; }
 
         public void AddTeamRobot(int argNumMembers, string argName) => mRobotsToMatch.Add((argNumMembers, argName));
-        public void AddRobot(string argName) => mRobotsToMatch.Add((1, argName));
+        public void AddRobot(string argName)
+        {
+            int pNum;
+
+            switch (MatchType)
+            {
+                case MatchTypes.Double:
+                case MatchTypes.Double4:
+                    pNum = 2;
+                    break;
+                case MatchTypes.Team:
+                    pNum = 8;
+                    break;
+                default:
+                    pNum = 1;
+                    break;
+            }
+
+            mRobotsToMatch.Add((pNum, argName));
+        }
 
 
         public void CrearRobotsToMatchSolo(string argName)
@@ -62,28 +81,69 @@ namespace NetCoreRobots.Core
 
         public void InitMatch()
         {
-            InitMatchRobots();
-            State = ArenaStates.Initialized;
+            if (State == ArenaStates.Created)
+            {
+                if (mMatchCancelToken == null)
+                    mMatchCancelToken = new CancellationTokenSource();
+                InitMatchRobots();
+                State = ArenaStates.Initialized;
+            }
         }
 
         public async Task StartMatch()
         {
-            if (mMatchCancelToken != null)
-                return;
+            switch (State)
+            {
+                case ArenaStates.Created:
+                case ArenaStates.Initialized:
+                    break;
+                default:
+                    return;
+            }
 
-            mMatchCancelToken = new CancellationTokenSource();
+            switch (State)
+            {
+                case ArenaStates.Starting:
+                case ArenaStates.Running:
+                case ArenaStates.Stopped:
+                case ArenaStates.Winner:
+                    DeInitRobot();
+                    State = ArenaStates.Created;
+                    break;
+            }
 
-            if (State != ArenaStates.Initialized)
-                InitMatch();
+            InitMatch();
 
             foreach (var pTask in mRobots)
                 pTask.Main.Invoke();
 
-            await LoopMain();
+            try
+            {
+                await LoopMain();
 
-            mMatchCancelToken = null;
+
+            }
+            finally
+            {
+                DeInitRobot();
+                mMatchCancelToken = null;
+                if (State != ArenaStates.Winner)
+                    State = ArenaStates.Stopped;
+            }
         }
 
+        //private 
+
+        public void CancelMatch()
+        {
+            mMatchCancelToken.Cancel();
+        }
+
+        /// <summary>
+        /// function returns the robot's current x axis location. loc_x() takes no arguments, and returns 0-999.
+        /// </summary>
+        /// <param name="argIdRobot"></param>
+        /// <returns></returns>
         async Task<double> IArena.loc_x(int argIdRobot)
         {
             if (argIdRobot >= mRobots.Count)
@@ -119,6 +179,7 @@ namespace NetCoreRobots.Core
                 var pId = mRobots.Count;
                 var pInfo = new RobotInfo
                 {
+                    CSRobot = pRobot.Item1,
                     Name = argName,
                     IdTeam = argIdTeam,
                     IdMemberTeam = argIdMemberTeam,
@@ -133,31 +194,25 @@ namespace NetCoreRobots.Core
             }
         }
 
+        private void DeInitRobot()
+        {
+            foreach (var pRobot in mRobots)
+                pRobot.CSRobot.DeInit();
+            mRobots.Clear();
+        }
+
         private async Task LoopMain()
         {
             var pToken = mMatchCancelToken.Token;
 
             State = ArenaStates.Running;
-            try
+            for (; ; )
             {
-                for (; ; )
-                {
-                    if (Display != null)
-                        await Display.Invoke();
-                    if (pToken.IsCancellationRequested)
-                        break;
-                }
+                if (Display != null)
+                    await Display.Invoke();
+                if (pToken.IsCancellationRequested)
+                    break;
             }
-            finally
-            {
-                StopMatch();
-                State = ArenaStates.Stopped;
-            }
-        }
-
-        private void StopMatch()
-        {
-            mMatchCancelToken.Cancel();
         }
     }
 }

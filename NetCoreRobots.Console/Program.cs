@@ -30,6 +30,7 @@ SOFTWARE.
 using NetCoreRobots.Core;
 using System;
 using System.Text;
+using System.Threading.Tasks;
 using static System.Console;
 
 namespace NetCoreRobots.Console
@@ -51,14 +52,14 @@ namespace NetCoreRobots.Console
         static int XPanelRobot;
         static int YPanelRobot;
 
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
-            mArena.FactoryRobots = new FactoryRobots();
+            mArena.FactoryRobots = new FactoryRobots(typeof(Program).Assembly);
             mArena.CrearRobotsToMatchSolo("RobotTest1");
             mArena.InitMatch();
             InitScreen();
             DisplayScreen();
-            mArena.StartMatch().RunSynchronously();
+            await mArena.StartMatch();
             //OutputEncoding = Encoding.GetEncoding(28591);
 
             //for (var i = 0; i < 512; i++)

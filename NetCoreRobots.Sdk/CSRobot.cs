@@ -52,7 +52,10 @@ namespace NetCoreRobots.Sdk
             return pAwaiter.GetResult();
         }
 
-
+        /// <summary>
+        /// function returns the robot's current x axis location. loc_x() takes no arguments, and returns 0-999.
+        /// </summary>
+        /// <returns></returns>
         protected async Task<int> loc_x_async()
         {
             if (mArena == null)

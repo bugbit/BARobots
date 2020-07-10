@@ -33,18 +33,22 @@ using System.Net.Mail;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using NetCoreRobots.Sdk;
 
 namespace NetCoreRobots.Core
 {
     public sealed class RobotInfo
     {
+        public IInitCSRobot CSRobot { get; set; }
         public string Name { get; set; }
         public int? IdTeam { get; set; }
         public int? IdMemberTeam { get; set; }
         public Func<Task> Main { get; set; }
         public CancellationTokenSource CancelToken { get; set; }
-        public double LocX { get; set; }
-        public double LocY { get; set; }
+        public double Velocidad { get; set; }  // m/s
+        public double Angle { get; set; }   // en rad
+        public double LocX { get; set; }    // m
+        public double LocY { get; set; }    // m
 
         //public RobotInfo(string argName, Func<Task> argMain)
         //{

@@ -37,6 +37,11 @@ namespace NetCoreRobots.Sdk
 {
     public interface IArena
     {
+        /// <summary>
+        /// function returns the robot's current x axis location. loc_x() takes no arguments, and returns 0-999.
+        /// </summary>
+        /// <param name="argIdRobot"></param>
+        /// <returns></returns>
         Task<double> loc_x(int argIdRobot);
         //CancellationToken CancelToken { get; }
         //double LocX { get; }

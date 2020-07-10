@@ -39,7 +39,7 @@ namespace NetCoreRobots.Core
 {
     public class FactoryRobots
     {
-        private Dictionary<string, (Type, Func<Task>)> mCache = new Dictionary<string, (Type, Func<Task>)>();
+        private Dictionary<string, (Type, Func<CSRobot, Task>)> mCache = new Dictionary<string, (Type, Func<CSRobot, Task>)>();
         private Dictionary<string, Type> mClassType = new Dictionary<string, Type>();
 
         public FactoryRobots(params Assembly[] argAssemblies)
@@ -71,14 +71,14 @@ namespace NetCoreRobots.Core
         {
             var pRobotTypeAndMain = GetRobotTypeAndMain(argName);
             var pRobot = Activator.CreateInstance(pRobotTypeAndMain.Item1);
+            var pRobot2 = (CSRobot)pRobot;
 
-
-            return ((CSRobot)pRobot, pRobotTypeAndMain.Item2);
+            return (pRobot2, () => pRobotTypeAndMain.Item2.Invoke(pRobot2));
         }
 
-        private (Type, Func<Task>) GetRobotTypeAndMain(string argName)
+        private (Type, Func<CSRobot, Task>) GetRobotTypeAndMain(string argName)
         {
-            if (mCache.TryGetValue(argName, out (Type, Func<Task>) pRobot))
+            if (mCache.TryGetValue(argName, out (Type, Func<CSRobot, Task>) pRobot))
                 return pRobot;
 
             if (!mClassType.TryGetValue(argName, out Type pType))
@@ -104,8 +104,14 @@ namespace NetCoreRobots.Core
 
             var pMain =
                 (pMainMethod.ReturnType == typeof(void))
-                    ? () => Task.Run((Action)Delegate.CreateDelegate(typeof(Action), pMainMethod))
-                    : (Func<Task>)Delegate.CreateDelegate(typeof(Func<Task>), pMainMethod);
+                    ? (async r =>
+                    {
+                        await Task.Run(() => pMainMethod.Invoke(r, null));
+                    })
+                    : (Func<CSRobot, Task>)(r =>
+                    {
+                        return (Task)pMainMethod.Invoke(r, null);
+                    });
             var pRobotTypeAndMain = (pType, pMain);
 
             mCache[argName] = pRobotTypeAndMain;
