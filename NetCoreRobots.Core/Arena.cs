@@ -156,21 +156,26 @@ namespace NetCoreRobots.Core
 
         private void InitMatchRobots()
         {
-            var pidTeam = 1;
+            var pIdRobot = 1;
+            var pIdTeamOrRobot = 1;
+            var pIdTeam = 1;
 
             foreach (var r in mRobotsToMatch)
             {
                 if (r.Item1 == 1)
-                    CreateRobot(r.Item2, null, null);
+                    CreateRobot(r.Item2, pIdRobot++, pIdTeamOrRobot++, null, null);
                 else
                 {
                     for (var pIdTeamMember = r.Item1; pIdTeamMember >= 1; pIdTeamMember--)
-                        CreateRobot(r.Item2, pidTeam, pIdTeamMember);
+                        CreateRobot(r.Item2, pIdRobot++, pIdTeamOrRobot, pIdTeam, pIdTeamMember);
+                    pIdTeamOrRobot++;
                 }
             }
+
+            InitPositionRobots();
         }
 
-        private RobotInfo CreateRobot(string argName, int? argIdTeam, int? argIdMemberTeam)
+        private RobotInfo CreateRobot(string argName, int argIdRobot, int argIdTeamRobot, int? argIdTeam, int? argIdMemberTeam)
         {
             var pRobot = FactoryRobots.Create(argName);
 
@@ -180,6 +185,8 @@ namespace NetCoreRobots.Core
                 var pInfo = new RobotInfo
                 {
                     CSRobot = pRobot.Item1,
+                    IdRobot = argIdRobot,
+                    IdTeamOrRobot = argIdTeamRobot,
                     Name = argName,
                     IdTeam = argIdTeam,
                     IdMemberTeam = argIdMemberTeam,
@@ -192,6 +199,11 @@ namespace NetCoreRobots.Core
 
                 return pInfo;
             }
+        }
+
+        private void InitPositionRobots()
+        {
+
         }
 
         private void DeInitRobot()

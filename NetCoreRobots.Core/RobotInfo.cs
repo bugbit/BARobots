@@ -40,7 +40,9 @@ namespace NetCoreRobots.Core
     public sealed class RobotInfo
     {
         public IInitCSRobot CSRobot { get; set; }
+        public int IdRobot { get; set; }
         public string Name { get; set; }
+        public int IdTeamOrRobot { get; set; }
         public int? IdTeam { get; set; }
         public int? IdMemberTeam { get; set; }
         public Func<Task> Main { get; set; }
