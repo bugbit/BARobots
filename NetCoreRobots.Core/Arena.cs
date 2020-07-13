@@ -29,6 +29,7 @@ SOFTWARE.
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -48,6 +49,8 @@ namespace NetCoreRobots.Core
         public FactoryRobots FactoryRobots { get; set; }
         public MatchTypes MatchType { get; set; } = MatchTypes.Free;
         public Func<Task> Display { get; set; }
+        public int MaxX { get; } = 1000;
+        public int MaxY { get; } = 1000;
 
         public void AddTeamRobot(int argNumMembers, string argName) => mRobotsToMatch.Add((argNumMembers, argName));
         public void AddRobot(string argName)
@@ -203,7 +206,25 @@ namespace NetCoreRobots.Core
 
         private void InitPositionRobots()
         {
+            int pCol = 1;
+            int pPow = 2;
 
+            while (pPow < mRobots.Count)
+            {
+                pCol++;
+                pPow *= pPow;
+            }
+
+            var pFilas2 = Math.DivRem(mRobots.Count, pCol, out int pRem);
+            var pFilas = (pRem != 0) ? pFilas2 + 1 : pFilas2;
+            var w = MaxX / pCol;
+            var h = MaxY / pFilas;
+            var y = 0;
+
+            for(;y<pFilas2;y++)
+            {
+                //var pRobot=m
+            }
         }
 
         private void DeInitRobot()
