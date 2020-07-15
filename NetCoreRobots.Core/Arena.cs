@@ -31,6 +31,7 @@ using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading;
 using System.Threading.Tasks;
 using NetCoreRobots.Sdk;
@@ -217,14 +218,47 @@ namespace NetCoreRobots.Core
 
             var pFilas2 = Math.DivRem(mRobots.Count, pCol, out int pRem);
             var pFilas = (pRem != 0) ? pFilas2 + 1 : pFilas2;
+            var pRndBytes = new byte[2 * mRobots.Count * (1 + 2)];
             var w = MaxX / pCol;
             var h = MaxY / pFilas;
             var y = 0;
+            var i = 0;
+            var j = 0;
 
-            for(;y<pFilas2;y++)
+            new RNGCryptoServiceProvider().GetBytes(pRndBytes);
+
+            var pRobots2 = ShuffleRobot(mRobots, pRndBytes, ref i);
+
+            for (var f = 0; f < pFilas2; f++, y += h)
             {
-                //var pRobot=m
+                for (var x = 0; x < MaxX; x += w, j++)
+                {
+                    pRobots2[j].LocX = x + (pRndBytes[i++] % w);
+                    pRobots2[j].LocY = y + (pRndBytes[i++] % h);
+                }
             }
+            if (pRem != 0)
+                for (var x = 0; x < MaxX; x += w, j++)
+                {
+                    pRobots2[j].LocX = x + (pRndBytes[i++] % w);
+                    pRobots2[j].LocY = y + (pRndBytes[i++] % h);
+                }
+        }
+
+        private RobotInfo[] ShuffleRobot(IEnumerable<RobotInfo> argElems, byte[] argRnds, ref int i)
+        {
+            var pShuffled = argElems.ToArray();
+
+            for (int pIdx = pShuffled.Length - 1; pIdx > 0; pIdx--)
+            {
+                int pIdxSwap = argRnds[i++] % pIdx;
+                var pTmp = pShuffled[pIdx];
+
+                pShuffled[pIdx] = pShuffled[pIdxSwap];
+                pShuffled[pIdxSwap] = pTmp;
+            }
+
+            return pShuffled.ToArray();
         }
 
         private void DeInitRobot()
