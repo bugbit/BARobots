@@ -49,6 +49,7 @@ namespace NetCoreRobots.Core
         public ArenaStates State { get; set; } = ArenaStates.Created;
         public FactoryRobots FactoryRobots { get; set; }
         public MatchTypes MatchType { get; set; } = MatchTypes.Free;
+        public RobotInfo[] Robots { get; private set; } = new RobotInfo[0];
         public Func<Task> Display { get; set; }
         public int MaxX { get; } = 1000;
         public int MaxY { get; } = 1000;
@@ -176,6 +177,7 @@ namespace NetCoreRobots.Core
                 }
             }
 
+            Robots = mRobots.ToArray();
             InitPositionRobots();
         }
 
@@ -218,7 +220,9 @@ namespace NetCoreRobots.Core
 
             var pFilas2 = Math.DivRem(mRobots.Count, pCol, out int pRem);
             var pFilas = (pRem != 0) ? pFilas2 + 1 : pFilas2;
-            var pRndBytes = new byte[2 * mRobots.Count * (1 + 2)];
+            var pRndShortCount = mRobots.Count * (1 + 2);
+            var pRndBytes = new byte[2 * pRndShortCount];
+            var pRndShort = new ushort[pRndShortCount];
             var w = MaxX / pCol;
             var h = MaxY / pFilas;
             var y = 0;
@@ -226,26 +230,27 @@ namespace NetCoreRobots.Core
             var j = 0;
 
             new RNGCryptoServiceProvider().GetBytes(pRndBytes);
+            Buffer.BlockCopy(pRndBytes, 0, pRndShort, 0, pRndBytes.Length);
 
-            var pRobots2 = ShuffleRobot(mRobots, pRndBytes, ref i);
+            var pRobots2 = ShuffleRobot(mRobots, pRndShort, ref i);
 
             for (var f = 0; f < pFilas2; f++, y += h)
             {
                 for (var x = 0; x < MaxX; x += w, j++)
                 {
-                    pRobots2[j].LocX = x + (pRndBytes[i++] % w);
-                    pRobots2[j].LocY = y + (pRndBytes[i++] % h);
+                    pRobots2[j].LocX = x + (pRndShort[i++] % w);
+                    pRobots2[j].LocY = y + (pRndShort[i++] % h);
                 }
             }
             if (pRem != 0)
                 for (var x = 0; x < MaxX; x += w, j++)
                 {
-                    pRobots2[j].LocX = x + (pRndBytes[i++] % w);
-                    pRobots2[j].LocY = y + (pRndBytes[i++] % h);
+                    pRobots2[j].LocX = x + (pRndShort[i++] % w);
+                    pRobots2[j].LocY = y + (pRndShort[i++] % h);
                 }
         }
 
-        private RobotInfo[] ShuffleRobot(IEnumerable<RobotInfo> argElems, byte[] argRnds, ref int i)
+        private RobotInfo[] ShuffleRobot(IEnumerable<RobotInfo> argElems, ushort[] argRnds, ref int i)
         {
             var pShuffled = argElems.ToArray();
 

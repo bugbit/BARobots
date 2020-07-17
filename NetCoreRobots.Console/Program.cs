@@ -29,6 +29,7 @@ SOFTWARE.
 
 using NetCoreRobots.Core;
 using System;
+using System.IO;
 using System.Text;
 using System.Threading.Tasks;
 using static System.Console;
@@ -41,10 +42,15 @@ namespace NetCoreRobots.Console
         const int StatusBoxesWitdh = 20;
         const int SepFieldStatusBoxesWitdh = 3;
 
-        static Arena mArena = new Arena();
+        static Arena mArena = new Arena
+        {
+            Display = DisplayArena,
+            FactoryRobots = new FactoryRobots(typeof(Program).Assembly)
+        };
 
         readonly static CoSize PanelRobot = new CoSize { w = StatusBoxesWitdh + SepFieldStatusBoxesWitdh, h = 5 };
 
+        static CoRect WindowOrig;
         static CoSize WindowS;
         static CoRect ArenaR;
         static int ArenaWidth;
@@ -54,7 +60,7 @@ namespace NetCoreRobots.Console
 
         static async Task Main(string[] args)
         {
-            mArena.FactoryRobots = new FactoryRobots(typeof(Program).Assembly);
+            CancelKeyPress += (s, e) => { e.Cancel = true; Cancel(); };
             mArena.CrearRobotsToMatchSolo("RobotTest1");
             mArena.InitMatch();
             InitScreen();
@@ -65,20 +71,26 @@ namespace NetCoreRobots.Console
             //for (var i = 0; i < 512; i++)
             //    Write($"{i} = {(char)i}\t");
 
-
+            End();
             ReadLine();
+        }
+
+        private static void GetWindowRect(out CoRect r)
+        {
+            r = new CoRect { x = WindowTop, y = WindowLeft, s = new CoSize { w = BufferWidth, h = BufferHeight } };
         }
 
         private static void InitScreen()
         {
+            GetWindowRect(out WindowOrig);
+
             var w1 = LargestWindowWidth - 2 - SepFieldStatusBoxesWitdh - StatusBoxesWitdh;
             var h1 = LargestWindowHeight - 2;
 
             CalcWindowSize(out int w, out int h);
             WindowS = new CoSize { w = w, h = h };
             SetWindowSize(w, h);
-            BufferWidth = w;
-            BufferHeight = h;
+            SetBufferSize(w, h);
             ArenaR = new CoRect
             {
                 x = 1,
@@ -93,6 +105,12 @@ namespace NetCoreRobots.Console
             //LargestWindowWidth
             w = 80;
             h = 60;
+        }
+
+        static void SetWindowRect(CoRect r)
+        {
+            SetBufferSize(r.s.w, r.s.h);
+            SetWindowPosition(r.x, r.y);
         }
 
         static void DisplayScreen()
@@ -132,9 +150,45 @@ namespace NetCoreRobots.Console
             WriteLine('┘');
         }
 
+        static Task DisplayArena() => Task.Run(DisplayArenaInternal);
+
+        static void DisplayArenaInternal()
+        {
+            var pIsCursor = CursorVisible;
+            GetWindowRect(out CoRect r);
+
+            try
+            {
+                SetWindowRect(ArenaR);
+                foreach (var pRobot in mArena.Robots)
+                {
+                    SetCursorPosition((int)pRobot.LocX * ArenaR.s.w / mArena.MaxX, (int)pRobot.LocY * ArenaR.s.h / mArena.MaxY);
+                    Write(pRobot.IdTeamOrRobot.ToString());
+                }
+            }
+            finally
+            {
+                SetWindowRect(r);
+                pIsCursor = CursorVisible;
+
+            }
+            //SetWindowRect()
+        }
+
         static void DisplayPanelRobots()
         {
             //buff
+        }
+
+        static void Cancel()
+        {
+            mArena.CancelMatch();
+        }
+
+        static void End()
+        {
+            SetWindowRect(WindowOrig);
+            SetCursorPosition(0, ArenaR.y + ArenaR.s.h);
         }
     }
 }
