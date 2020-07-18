@@ -32,6 +32,7 @@ using System;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+
 using static System.Console;
 
 namespace NetCoreRobots.Console
@@ -39,32 +40,20 @@ namespace NetCoreRobots.Console
     // https://en.wikipedia.org/wiki/Box-drawing_character
     class Program
     {
-        const int StatusBoxesWitdh = 20;
-        const int SepFieldStatusBoxesWitdh = 3;
-
         static Arena mArena = new Arena
         {
             Display = DisplayArena,
             FactoryRobots = new FactoryRobots(typeof(Program).Assembly)
         };
 
-        readonly static CoSize PanelRobot = new CoSize { w = StatusBoxesWitdh + SepFieldStatusBoxesWitdh, h = 5 };
-
-        static CoRect WindowOrig;
-        static CoSize WindowS;
-        static CoRect ArenaR;
-        static int ArenaWidth;
-        static int ArenaHeight;
-        static int XPanelRobot;
-        static int YPanelRobot;
+        static CoRender mRender = new CoRender();
 
         static async Task Main(string[] args)
         {
             CancelKeyPress += (s, e) => { e.Cancel = true; Cancel(); };
             mArena.CrearRobotsToMatchSolo("RobotTest1");
             mArena.InitMatch();
-            InitScreen();
-            DisplayScreen();
+            mRender.Init(mArena);
             await mArena.StartMatch();
             //OutputEncoding = Encoding.GetEncoding(28591);
 
@@ -75,120 +64,36 @@ namespace NetCoreRobots.Console
             ReadLine();
         }
 
-        private static void GetWindowRect(out CoRect r)
-        {
-            r = new CoRect { x = WindowTop, y = WindowLeft, s = new CoSize { w = BufferWidth, h = BufferHeight } };
-        }
+        static Task DisplayArena() => Task.Run(() => mRender.Display(mArena));
 
-        private static void InitScreen()
-        {
-            GetWindowRect(out WindowOrig);
+        //static void DisplayArenaInternal()
+        //{
+        //    var pIsCursor = CursorVisible;
+        //    GetWindowRect(out CoRect r);
 
-            var w1 = LargestWindowWidth - 2 - SepFieldStatusBoxesWitdh - StatusBoxesWitdh;
-            var h1 = LargestWindowHeight - 2;
+        //    try
+        //    {
+        //        SetWindowRect(ArenaR);
+        //        foreach (var pRobot in mArena.Robots)
+        //        {
+        //            SetCursorPosition((int)pRobot.LocX * ArenaR.s.w / mArena.MaxX, (int)pRobot.LocY * ArenaR.s.h / mArena.MaxY);
+        //            Write(pRobot.IdTeamOrRobot.ToString());
+        //        }
+        //    }
+        //    finally
+        //    {
+        //        SetWindowRect(r);
+        //        pIsCursor = CursorVisible;
 
-            CalcWindowSize(out int w, out int h);
-            WindowS = new CoSize { w = w, h = h };
-            SetWindowSize(w, h);
-            SetBufferSize(w, h);
-            ArenaR = new CoRect
-            {
-                x = 1,
-                y = 1,
-                s = new CoSize { w = w - StatusBoxesWitdh - SepFieldStatusBoxesWitdh - 2, h = h - 2 }
-            };
-        }
-
-        static void CalcWindowSize(out int w, out int h)
-        {
-            //LargestWindowHeight
-            //LargestWindowWidth
-            w = 80;
-            h = 60;
-        }
-
-        static void SetWindowRect(CoRect r)
-        {
-            SetBufferSize(r.s.w, r.s.h);
-            SetWindowPosition(r.x, r.y);
-        }
-
-        static void DisplayScreen()
-        {
-            var pCursor = CursorVisible;
-
-            CursorVisible = false;
-            try
-            {
-                Clear();
-                DisplayField();
-            }
-            finally
-            {
-                CursorVisible = pCursor;
-            }
-        }
-
-        static void DisplayField()
-        {
-            int pW1 = ArenaR.x + ArenaR.s.w;
-
-            SetCursorPosition(0, 0);
-            Write('┌');
-            for (var x = 1; x < ArenaR.s.w; x++)
-                Write('─');
-            WriteLine('┐');
-            for (var y = 1; y < ArenaR.s.h; y++)
-            {
-                Write('│');
-                SetCursorPosition(pW1, y);
-                WriteLine('│');
-            }
-            Write('└');
-            for (var x = 1; x < pW1; x++)
-                Write('─');
-            WriteLine('┘');
-        }
-
-        static Task DisplayArena() => Task.Run(DisplayArenaInternal);
-
-        static void DisplayArenaInternal()
-        {
-            var pIsCursor = CursorVisible;
-            GetWindowRect(out CoRect r);
-
-            try
-            {
-                SetWindowRect(ArenaR);
-                foreach (var pRobot in mArena.Robots)
-                {
-                    SetCursorPosition((int)pRobot.LocX * ArenaR.s.w / mArena.MaxX, (int)pRobot.LocY * ArenaR.s.h / mArena.MaxY);
-                    Write(pRobot.IdTeamOrRobot.ToString());
-                }
-            }
-            finally
-            {
-                SetWindowRect(r);
-                pIsCursor = CursorVisible;
-
-            }
-            //SetWindowRect()
-        }
-
-        static void DisplayPanelRobots()
-        {
-            //buff
-        }
+        //    }
+        //    //SetWindowRect()
+        //}        
 
         static void Cancel()
         {
             mArena.CancelMatch();
         }
 
-        static void End()
-        {
-            SetWindowRect(WindowOrig);
-            SetCursorPosition(0, ArenaR.y + ArenaR.s.h);
-        }
+        static void End() => mRender.End(mArena);
     }
 }

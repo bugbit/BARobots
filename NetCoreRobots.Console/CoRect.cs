@@ -6,7 +6,7 @@ namespace NetCoreRobots.Console
 {
     struct CoRect
     {
-        public int x, y;
+        public CoPos p;
         public CoSize s;
     }
 }
