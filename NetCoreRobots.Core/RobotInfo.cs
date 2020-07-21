@@ -47,7 +47,9 @@ namespace NetCoreRobots.Core
         public int? IdMemberTeam { get; set; }
         public Func<Task> Main { get; set; }
         public CancellationTokenSource CancelToken { get; set; }
-        public double Velocidad { get; set; }  // m/s
+        public int PorSpeed { get; set; }
+        public double Speed { get; set; }  // m/s
+        public double SpeedTo { get; set; }  // m/s
         public double Angle { get; set; }   // en rad
         public double LocX { get; set; }    // m
         public double LocY { get; set; }    // m

@@ -30,18 +30,21 @@ SOFTWARE.
 using System;
 using System.Collections.Generic;
 using System.Text;
+using NetCoreRobots.Core;
 
 namespace NetCoreRobots.Console
 {
-    class CoPos
+    class CoRobotInfo
     {
-        public int x { get; set; }
-        public int y { get; set; }
+        public RobotInfo RobotInfo { get; set; }
+        public CoPos PosAnt { get; set; }
+        public CoPos Pos { get; } = new CoPos();
 
-        public void SetPos(int x, int y)
+        public void SetPos(int x, int y) => Pos.SetPos(x, y);
+
+        public void ActPos()
         {
-            this.x = x;
-            this.y = y;
+            PosAnt = Pos;
         }
     }
 }

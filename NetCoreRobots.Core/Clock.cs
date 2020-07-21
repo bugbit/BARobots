@@ -27,21 +27,40 @@ SOFTWARE.
 
 #endregion
 
+using NetCoreRobots.Core.Internal;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 using System.Text;
 
-namespace NetCoreRobots.Console
+namespace NetCoreRobots.Core
 {
-    class CoPos
+    public class Clock
     {
-        public int x { get; set; }
-        public int y { get; set; }
+        static IClock mClock;
 
-        public void SetPos(int x, int y)
+        private DateTime mTimeStartGame;
+        private DateTime mTimeUpdate;
+
+        public double Elapsed { get; private set; } // s
+        public double ElapsedGame => (mClock.UtcNow - mTimeStartGame).TotalSeconds;  // s
+
+        static Clock()
         {
-            this.x = x;
-            this.y = y;
+            mClock =
+             (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+                 ? new HiResDateTime()
+                 :
+                     (HighResolutionDateTime.IsAvailable) ? (IClock)new HighResolutionDateTime() : new HiResDateTime();
+        }
+
+        public void StartGame() => mTimeStartGame = mTimeUpdate = mClock.UtcNow;
+        public void StartUpdate()
+        {
+            var pTime = mClock.UtcNow;
+
+            Elapsed = (pTime - mTimeUpdate).TotalSeconds;
+            mTimeUpdate = mClock.UtcNow;
         }
     }
 }

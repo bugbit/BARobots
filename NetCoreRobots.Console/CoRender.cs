@@ -30,6 +30,9 @@ SOFTWARE.
 using NetCoreRobots.Core;
 using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
+using System.Linq;
+using System.Net.NetworkInformation;
 using System.Text;
 
 using static System.Console;
@@ -48,6 +51,7 @@ namespace NetCoreRobots.Console
         private CoRect mArenaR;
         private string mField1;
         private string mField2;
+        private ImmutableArray<CoRobotInfo> mRobots;
 
         public CoSize WindowS { get; private set; }
 
@@ -67,6 +71,7 @@ namespace NetCoreRobots.Console
             };
             mField1 = $"┌{new string('─', mArenaR.s.w)}┐";
             mField2 = $"└{new string('─', mArenaR.s.w)}┘";
+            mRobots = (from r in argArena.Robots select new CoRobotInfo { RobotInfo = r }).ToImmutableArray();
             CursorVisible = false;
             SetWindowSize(WindowS.w, WindowS.h);
             SetBufferSize(WindowS.w, WindowS.h);
@@ -75,11 +80,9 @@ namespace NetCoreRobots.Console
         }
         public void Display(Arena argArena)
         {
-            foreach (var pRobot in argArena.Robots)
-            {
-                SetCursorPosition(mArenaR.p.x + (int)pRobot.LocX * mArenaR.s.w / argArena.MaxX, mArenaR.p.y + (int)pRobot.LocY * mArenaR.s.h / argArena.MaxY);
-                Write(pRobot.IdTeamOrRobot.ToString());
-            }
+            CalcRobotsPos(argArena);
+            CleanRobotsScreen();
+            DisplatRobots();
         }
 
         public void End(Arena argArena)
@@ -101,6 +104,43 @@ namespace NetCoreRobots.Console
                 WriteLine('│');
             }
             Write(mField2);
+        }
+
+        private void CalcRobotsPos(Arena argArena)
+        {
+            foreach (var r in mRobots)
+            {
+                var ri = r.RobotInfo;
+                // SetCursorPosition(mArenaR.p.x + (int)pRobot.LocX * mArenaR.s.w / argArena.MaxX, mArenaR.p.y + (int)pRobot.LocY * mArenaR.s.h / argArena.MaxY);
+                r.SetPos(mArenaR.p.x + (int)ri.LocX * mArenaR.s.w / argArena.MaxX, mArenaR.p.y + (int)ri.LocY * mArenaR.s.h / argArena.MaxY);
+            }
+        }
+
+        private void CleanRobotsScreen()
+        {
+            foreach (var r in mRobots)
+            {
+                var pPos = r.PosAnt;
+                var pPosAct = r.Pos;
+
+                if (pPos != null && (pPos.x != pPosAct.x || pPos.y != pPosAct.y))
+                {
+                    SetCursorPosition(pPos.x, pPos.y);
+                    Write(' ');
+                }
+            }
+        }
+
+        private void DisplatRobots()
+        {
+            foreach (var r in mRobots)
+            {
+                var pPos = r.Pos;
+
+                SetCursorPosition(pPos.x, pPos.y);
+                Write(r.RobotInfo.IdTeamOrRobot.ToString());
+                r.ActPos();
+            }
         }
     }
 }

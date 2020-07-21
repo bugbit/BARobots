@@ -29,19 +29,32 @@ SOFTWARE.
 
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Text;
 
-namespace NetCoreRobots.Console
+namespace NetCoreRobots.Core.Internal
 {
-    class CoPos
+    //http://stackoverflow.com/questions/1416139/how-to-get-timestamp-of-tick-precision-in-net-c
+    class HiResDateTime : IClock
     {
-        public int x { get; set; }
-        public int y { get; set; }
+        private DateTime _startTime;
+        private Stopwatch _stopWatch;
+        private readonly TimeSpan MaxIdle = TimeSpan.FromSeconds(10);
 
-        public void SetPos(int x, int y)
+        public DateTime UtcNow
         {
-            this.x = x;
-            this.y = y;
+            get
+            {
+                if (_stopWatch == null || _startTime.Add(MaxIdle) < DateTime.UtcNow)
+                    Reset();
+                return _startTime.AddTicks(_stopWatch.Elapsed.Ticks);
+            }
+        }
+
+        private void Reset()
+        {
+            _startTime = DateTime.UtcNow;
+            _stopWatch = Stopwatch.StartNew();
         }
     }
 }

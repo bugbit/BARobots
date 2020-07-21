@@ -45,6 +45,7 @@ namespace NetCoreRobots.Core
         private CancellationTokenSource mMatchCancelToken = null;
         private List<RobotInfo> mRobots = new List<RobotInfo>();
         private List<(int, string)> mRobotsToMatch = new List<(int, string)>();
+        private Clock mClock = new Clock();
 
         public ArenaStates State { get; set; } = ArenaStates.Created;
         public FactoryRobots FactoryRobots { get; set; }
@@ -124,6 +125,7 @@ namespace NetCoreRobots.Core
 
             try
             {
+                mClock.StartGame();
                 await LoopMain();
 
 
@@ -280,10 +282,19 @@ namespace NetCoreRobots.Core
             State = ArenaStates.Running;
             for (; ; )
             {
+                mClock.StartUpdate();
                 if (Display != null)
                     await Display.Invoke();
                 if (pToken.IsCancellationRequested)
                     break;
+            }
+        }
+
+        private void UpdateRobots()
+        {
+            foreach (var pRobot in mRobots)
+            {
+
             }
         }
     }

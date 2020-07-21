@@ -31,17 +31,10 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 
-namespace NetCoreRobots.Console
+namespace NetCoreRobots.Core.Internal
 {
-    class CoPos
+    interface IClock
     {
-        public int x { get; set; }
-        public int y { get; set; }
-
-        public void SetPos(int x, int y)
-        {
-            this.x = x;
-            this.y = y;
-        }
+        DateTime UtcNow { get; }
     }
 }
