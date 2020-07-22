@@ -27,40 +27,32 @@ SOFTWARE.
 
 #endregion
 
-using NetCoreRobots.Core.Internal;
 using System;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Text;
+
+using static System.Math;
 
 namespace NetCoreRobots.Core
 {
-    public class Clock
+    public class MathEx
     {
-        static IClock mClock;
-
-        private DateTime mTimeStartGame;
-        private DateTime? mTimeUpdate;
-
-        public double Elapsed { get; private set; } // s
-        public double ElapsedGame => (mClock.UtcNow - mTimeStartGame).TotalSeconds;  // s
-
-        static Clock()
+        public static double Deg2Rad(double degrees)
         {
-            mClock =
-             (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                 ? new HiResDateTime()
-                 :
-                     (HighResolutionDateTime.IsAvailable) ? (IClock)new HighResolutionDateTime() : new HiResDateTime();
+            return degrees * PI / 180.0;
         }
 
-        public void StartGame() => mTimeStartGame = mClock.UtcNow;
-        public void StartUpdate()
+        public static double Rad2Deg(double rad)
         {
-            var pTime = mClock.UtcNow;
+            return rad * 180.0 / PI;
+        }
 
-            Elapsed = (mTimeUpdate.HasValue) ? (pTime - mTimeUpdate.Value).TotalSeconds : 0;
-            mTimeUpdate = mClock.UtcNow;
+        public static double FixDegrees(double degrees)
+        {
+            degrees %= 360.0;
+            if (degrees < 0)
+                degrees += 360.0;
+            return degrees;
         }
     }
 }

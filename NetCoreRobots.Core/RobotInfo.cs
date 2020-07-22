@@ -35,10 +35,15 @@ using System.Threading;
 using System.Threading.Tasks;
 using NetCoreRobots.Sdk;
 
+using static System.Math;
+using static NetCoreRobots.Core.MathEx;
+
 namespace NetCoreRobots.Core
 {
     public sealed class RobotInfo
     {
+        private double mAngle;
+
         public IInitCSRobot CSRobot { get; set; }
         public int IdRobot { get; set; }
         public string Name { get; set; }
@@ -50,9 +55,22 @@ namespace NetCoreRobots.Core
         public int PorSpeed { get; set; }
         public double Speed { get; set; }  // m/s
         public double SpeedTo { get; set; }  // m/s
-        public double Angle { get; set; }   // en rad
+        public double Angle
+        {
+            get => mAngle;
+            set
+            {
+                var pRad = Deg2Rad(value);
+
+                mAngle = value;
+                AngCos = Cos(pRad);
+                AngSin = Sin(pRad);
+            }
+        }   // en rad
         public double LocX { get; set; }    // m
         public double LocY { get; set; }    // m
+        public double AngCos { get; private set; }
+        public double AngSin { get; private set; }
 
         //public RobotInfo(string argName, Func<Task> argMain)
         //{

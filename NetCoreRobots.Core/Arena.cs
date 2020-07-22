@@ -36,6 +36,9 @@ using System.Threading;
 using System.Threading.Tasks;
 using NetCoreRobots.Sdk;
 
+using static System.Math;
+using static NetCoreRobots.Core.MathEx;
+
 namespace NetCoreRobots.Core
 {
     public sealed class Arena : IArena
@@ -46,6 +49,7 @@ namespace NetCoreRobots.Core
         private List<RobotInfo> mRobots = new List<RobotInfo>();
         private List<(int, string)> mRobotsToMatch = new List<(int, string)>();
         private Clock mClock = new Clock();
+        private Random mRnd = new Random();
 
         public ArenaStates State { get; set; } = ArenaStates.Created;
         public FactoryRobots FactoryRobots { get; set; }
@@ -54,6 +58,21 @@ namespace NetCoreRobots.Core
         public Func<Task> Display { get; set; }
         public int MaxX { get; } = 1000;
         public int MaxY { get; } = 1000;
+        /// <summary>
+        /// m/s
+        /// </summary>
+        public double Acceleration { get; } = 5;
+        /// <summary>
+        /// m/s
+        /// </summary>
+        public double SpeedMax { get; } = 30;
+        public double SpeedMaxToDrive { get; }
+
+        public Arena()
+        {
+            SpeedMaxToDrive = SpeedMax / 2;
+        }
+
 
         public void AddTeamRobot(int argNumMembers, string argName) => mRobotsToMatch.Add((argNumMembers, argName));
         public void AddRobot(string argName)
@@ -92,6 +111,7 @@ namespace NetCoreRobots.Core
                 if (mMatchCancelToken == null)
                     mMatchCancelToken = new CancellationTokenSource();
                 InitMatchRobots();
+                mRnd = new Random();
                 State = ArenaStates.Initialized;
             }
         }
@@ -147,6 +167,34 @@ namespace NetCoreRobots.Core
         }
 
         /// <summary>
+        /// The speed() function returns the current speed of the robot. speed() takes no arguments, and returns the percent of speed, 0-100. Note that speed() may not always be the same as the last drive(), because of acceleration and deceleration.
+        ///
+        ///Examples:
+        ///drive(270,100);   /* start drive, due south */
+        ///; ; ;             /* other instructions */
+        ///if (speed() == 0) /* check current speed */
+        ///{
+        ///drive(90,20);   /* ran into the south wall, or another robot */
+        ///}
+        /// </summary>
+        /// <param name="argIdRobot"></param>
+        /// <returns></returns>
+        async Task<int> IArena.speed(int argIdRobot)
+        {
+            if (argIdRobot >= mRobots.Count)
+                throw new ArgumentOutOfRangeException();
+
+            await Task.Yield();
+
+            var pRobot = mRobots[argIdRobot];
+
+            lock (pRobot)
+            {
+                return pRobot.PorSpeed;
+            }
+        }
+
+        /// <summary>
         /// function returns the robot's current x axis location. loc_x() takes no arguments, and returns 0-999.
         /// </summary>
         /// <param name="argIdRobot"></param>
@@ -158,7 +206,89 @@ namespace NetCoreRobots.Core
 
             await Task.Yield();
 
-            return mRobots[argIdRobot].LocX;
+            var pRobot = mRobots[argIdRobot];
+
+            lock (pRobot)
+            {
+                return pRobot.LocX;
+            }
+        }
+
+        /// <summary>
+        ///  The loc_y() function is similar to loc_x(), but returns the current y axis position.
+        /// </summary>
+        /// <param name="argIdRobot"></param>
+        /// <returns></returns>
+        async Task<double> IArena.loc_y(int argIdRobot)
+        {
+            if (argIdRobot >= mRobots.Count)
+                throw new ArgumentOutOfRangeException();
+
+            await Task.Yield();
+
+            var pRobot = mRobots[argIdRobot];
+
+            lock (pRobot)
+            {
+                return pRobot.LocY;
+            }
+        }
+
+        /// <summary>
+        /// The rand() function returns a random number between 0 and limit, up to 32767.
+        /// </summary>
+        /// <param name="limit"></param>
+        /// <returns></returns>
+        int IArena.rand(int limit) => mRnd.Next(0, limit);
+
+        /// <summary>
+        /// The sqrt() returns the square root of a number. Number is made positive, if necessary.
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        int IArena.sqrt(int value) => (int)Sqrt(Abs(value));
+
+        /// <summary>
+        ///  atan() takes a ratio argument that has been scaled up by 100,000, and returns a degree value, between -90 and +90
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        int IArena.atan(int value)
+        {
+            return (int)FixDegrees(Rad2Deg(Atan(value / 100000.0)));
+        }
+
+        /// <summary>
+        /// function activates the robot's drive mechanism, on a
+        /// specified heading and speed.Degree is forced into the range
+        /// 0-359 as in scan().  Speed is expressed as a percent, with 100 as
+        /// maximum.A speed of 0 disengages the drive.Changes in
+        /// direction can be negotiated at speeds of less than 50 percent.
+        /// Examples:
+        /// drive(0,100);  /* head due east, at maximum speed */
+        /// drive(90,0);   /* stop motion */
+        /// </summary>
+        /// <param name="degrees">is the direction of movement of the robot (angles start from 3 o'clock and increase clockwise). You must remember that robots can change their direction only if the speed is lower that 50% (say 15 m/s).</param>
+        /// <param name="speed">is the speed in percent that the robot must reach: 0 means 0 m/s, 100 means 30 m/s.</param>
+        /// <returns></returns>
+        async Task IArena.drive(int argIdRobot, int degrees, int speed)
+        {
+            if (argIdRobot >= mRobots.Count)
+                throw new ArgumentOutOfRangeException();
+
+            await Task.Yield();
+
+            var pRobot = mRobots[argIdRobot];
+
+            lock (pRobot)
+            {
+                pRobot.Angle = FixDegrees(degrees);
+                if (pRobot.Speed <= SpeedMaxToDrive)
+                {
+                    pRobot.PorSpeed = speed;
+                    pRobot.SpeedTo = SpeedMax * speed / 100.0d;
+                }
+            }
         }
 
         private void InitMatchRobots()
@@ -220,7 +350,7 @@ namespace NetCoreRobots.Core
                 pPow *= pPow;
             }
 
-            var pFilas2 = Math.DivRem(mRobots.Count, pCol, out int pRem);
+            var pFilas2 = DivRem(mRobots.Count, pCol, out int pRem);
             var pFilas = (pRem != 0) ? pFilas2 + 1 : pFilas2;
             var pRndShortCount = mRobots.Count * (1 + 2);
             var pRndBytes = new byte[2 * pRndShortCount];
@@ -282,19 +412,53 @@ namespace NetCoreRobots.Core
             State = ArenaStates.Running;
             for (; ; )
             {
-                mClock.StartUpdate();
-                if (Display != null)
-                    await Display.Invoke();
                 if (pToken.IsCancellationRequested)
                     break;
+                if (Display != null)
+                    await Display.Invoke();
+                Update();
             }
+        }
+
+        private void Update()
+        {
+            mClock.StartUpdate();
+            UpdateRobots();
         }
 
         private void UpdateRobots()
         {
             foreach (var pRobot in mRobots)
-            {
+                UpdateRobot(pRobot);
+        }
 
+        private void UpdateRobot(RobotInfo argRobot)
+        {
+            lock (argRobot)
+            {
+                var pDiff = argRobot.SpeedTo - argRobot.Speed;
+                var pSpeed = (pDiff > 0) ? Acceleration * mClock.Elapsed : (pDiff < 0) ? -Acceleration * mClock.Elapsed : 0;
+
+                if (pSpeed != 0)
+                    argRobot.Speed = Max(argRobot.Speed + pSpeed, argRobot.SpeedTo);
+                if (argRobot.Speed > 0)
+                {
+                    var d = argRobot.Speed * mClock.Elapsed;
+
+                    argRobot.LocX += d * argRobot.AngCos;
+                    argRobot.LocY += d * argRobot.AngSin;
+                }
+
+                if (argRobot.LocX > MaxX)
+                {
+                    argRobot.LocX = MaxX - 1;
+                    argRobot.Speed = argRobot.SpeedTo = 0;
+                }
+                if (argRobot.LocY > MaxY)
+                {
+                    argRobot.LocY = MaxY - 1;
+                    argRobot.Speed = argRobot.SpeedTo = 0;
+                }
             }
         }
     }

@@ -58,7 +58,7 @@ namespace NetCoreRobots.Console
         public void Init(Arena argArena)
         {
             var w = 80;
-            var h = 60;
+            var h = 25; // 60
             //var w1 = LargestWindowWidth - 2 - SepFieldStatusBoxesWitdh - StatusBoxesWitdh;
             //var h1 = LargestWindowHeight - 2;
 
@@ -74,6 +74,7 @@ namespace NetCoreRobots.Console
             mRobots = (from r in argArena.Robots select new CoRobotInfo { RobotInfo = r }).ToImmutableArray();
             CursorVisible = false;
             SetWindowSize(WindowS.w, WindowS.h);
+            SetCursorPosition(0, 0);
             SetBufferSize(WindowS.w, WindowS.h);
             Clear();
             DisplayField(argArena);
@@ -111,8 +112,8 @@ namespace NetCoreRobots.Console
             foreach (var r in mRobots)
             {
                 var ri = r.RobotInfo;
-                // SetCursorPosition(mArenaR.p.x + (int)pRobot.LocX * mArenaR.s.w / argArena.MaxX, mArenaR.p.y + (int)pRobot.LocY * mArenaR.s.h / argArena.MaxY);
-                r.SetPos(mArenaR.p.x + (int)ri.LocX * mArenaR.s.w / argArena.MaxX, mArenaR.p.y + (int)ri.LocY * mArenaR.s.h / argArena.MaxY);
+
+                r.SetPos(mArenaR.p.x + (int)ri.LocX * mArenaR.s.w / argArena.MaxX, mArenaR.p.y + (int)(mArenaR.s.h * (argArena.MaxY - ri.LocY) / argArena.MaxY));
             }
         }
 

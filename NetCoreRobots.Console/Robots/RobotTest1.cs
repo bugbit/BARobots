@@ -41,6 +41,7 @@ namespace NetCoreRobots.Console.Robots
     {
         void main()
         {
+            drive(45, 100);
         }
         //async Task main()
         //{

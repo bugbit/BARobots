@@ -44,7 +44,13 @@ namespace NetCoreRobots.Console
 
         public void ActPos()
         {
-            PosAnt = Pos;
+            if (PosAnt == null)
+                PosAnt = new CoPos { x = Pos.x, y = Pos.y };
+            else
+            {
+                PosAnt.x = Pos.x;
+                PosAnt.y = Pos.y;
+            }
         }
     }
 }
