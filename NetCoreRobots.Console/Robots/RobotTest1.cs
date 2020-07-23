@@ -41,7 +41,23 @@ namespace NetCoreRobots.Console.Robots
     {
         void main()
         {
-            drive(45, 100);
+            var a = 0;
+
+            for (; ; )
+            {
+                if (a == 0)
+                    a = rand(89);
+                else if (a < 90)
+                    a = 180 + rand(89);
+                else if (a < 180)
+                    a = 270 + rand(89);
+                else if (a < 270)
+                    a = rand(89);
+                else
+                    a = 90 + rand(89);
+                drive(a, 100);
+                while (speed() > 0) ;
+            }
         }
         //async Task main()
         //{

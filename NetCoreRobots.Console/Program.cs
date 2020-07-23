@@ -51,8 +51,8 @@ namespace NetCoreRobots.Console
         static async Task Main(string[] args)
         {
             CancelKeyPress += (s, e) => { e.Cancel = true; Cancel(); };
-            //mArena.CrearRobotsToMatchSolo("RobotTest1");
-            mArena.CrearRobotsToMatchSolo("Rabbit");
+            mArena.CrearRobotsToMatchSolo("RobotTest1");
+            //mArena.CrearRobotsToMatchSolo("Rabbit");
             mArena.InitMatch();
             mRender.Init(mArena);
             await mArena.StartMatch();

@@ -113,7 +113,7 @@ namespace NetCoreRobots.Console
             {
                 var ri = r.RobotInfo;
 
-                r.SetPos(mArenaR.p.x + (int)ri.LocX * mArenaR.s.w / argArena.MaxX, mArenaR.p.y + (int)(mArenaR.s.h * (argArena.MaxY - ri.LocY) / argArena.MaxY));
+                r.SetPos(mArenaR.p.x + (int)ri.LocX * mArenaR.s.w / argArena.MaxX, mArenaR.p.y + (int)(mArenaR.s.h * (argArena.MaxY - ri.LocY - 1) / argArena.MaxY));
             }
         }
 

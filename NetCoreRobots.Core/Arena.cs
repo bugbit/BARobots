@@ -440,7 +440,10 @@ namespace NetCoreRobots.Core
                 var pSpeed = (pDiff > 0) ? Acceleration * mClock.Elapsed : (pDiff < 0) ? -Acceleration * mClock.Elapsed : 0;
 
                 if (pSpeed != 0)
+                {
                     argRobot.Speed = Max(argRobot.Speed + pSpeed, argRobot.SpeedTo);
+                    argRobot.PorSpeed = (int)(100.0d * argRobot.Speed / SpeedMax);
+                }
                 if (argRobot.Speed > 0)
                 {
                     var d = argRobot.Speed * mClock.Elapsed;
@@ -452,12 +455,22 @@ namespace NetCoreRobots.Core
                 if (argRobot.LocX > MaxX)
                 {
                     argRobot.LocX = MaxX - 1;
-                    argRobot.Speed = argRobot.SpeedTo = 0;
+                    argRobot.Speed = argRobot.SpeedTo = argRobot.PorSpeed = 0;
+                }
+                else if (argRobot.LocX < 0)
+                {
+                    argRobot.LocX = 0;
+                    argRobot.Speed = argRobot.SpeedTo = argRobot.PorSpeed = 0;
                 }
                 if (argRobot.LocY > MaxY)
                 {
                     argRobot.LocY = MaxY - 1;
-                    argRobot.Speed = argRobot.SpeedTo = 0;
+                    argRobot.Speed = argRobot.SpeedTo = argRobot.PorSpeed = 0;
+                }
+                else if (argRobot.LocY < 0)
+                {
+                    argRobot.LocY = 0;
+                    argRobot.Speed = argRobot.SpeedTo = argRobot.PorSpeed = 0;
                 }
             }
         }
