@@ -27,9 +27,9 @@ SOFTWARE.
 
 #endregion
 
-using NetCoreRobots.Core.Internal;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -37,30 +37,45 @@ namespace NetCoreRobots.Core
 {
     public class Clock
     {
-        static IClock mClock;
+        //http://stackoverflow.com/questions/1416139/how-to-get-timestamp-of-tick-precision-in-net-c
+        private DateTime _startTime;
+        private Stopwatch _stopWatch;
+        private readonly TimeSpan MaxIdle = TimeSpan.FromSeconds(10);
 
-        private DateTime mTimeStartGame;
-        private DateTime? mTimeUpdate;
+        private long mTicksStartGame;
+        private long? mTicksLastUpdate;
+
+        public double Speed { get; set; } = 10;
 
         public double Elapsed { get; private set; } // s
-        public double ElapsedGame => (mClock.UtcNow - mTimeStartGame).TotalSeconds;  // s
+        public double ElapsedGame => GetElapsedSeconds(Ticks, mTicksStartGame);  // s
 
-        static Clock()
-        {
-            mClock =
-             (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
-                 ? new HiResDateTime()
-                 :
-                     (HighResolutionDateTime.IsAvailable) ? (IClock)new HighResolutionDateTime() : new HiResDateTime();
-        }
-
-        public void StartGame() => mTimeStartGame = mClock.UtcNow;
+        public void StartGame() => mTicksStartGame = Ticks;
         public void StartUpdate()
         {
-            var pTime = mClock.UtcNow;
+            var pTicks = Ticks;
 
-            Elapsed = (mTimeUpdate.HasValue) ? (pTime - mTimeUpdate.Value).TotalSeconds : 0;
-            mTimeUpdate = mClock.UtcNow;
+            Elapsed = (mTicksLastUpdate.HasValue) ? GetElapsedSeconds(pTicks, mTicksLastUpdate.Value) : 0;
+            mTicksLastUpdate = pTicks;
+        }
+
+        private double GetElapsedSeconds(long argTickInit, long argTickEnd) => (double)(argTickEnd - argTickInit) * Speed / Stopwatch.Frequency;
+
+        //http://stackoverflow.com/questions/1416139/how-to-get-timestamp-of-tick-precision-in-net-c
+        private long Ticks
+        {
+            get
+            {
+                if (_stopWatch == null || _startTime.Add(MaxIdle) < DateTime.UtcNow)
+                    Reset();
+                return _startTime.Ticks + _stopWatch.Elapsed.Ticks;
+            }
+        }
+
+        private void Reset()
+        {
+            _startTime = DateTime.UtcNow;
+            _stopWatch = Stopwatch.StartNew();
         }
     }
 }
