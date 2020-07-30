@@ -166,6 +166,8 @@ namespace NetCoreRobots.Core
             mMatchCancelToken.Cancel();
         }
 
+        public double GetTime() => mClock.ElapsedGame;
+
         /// <summary>
         /// The speed() function returns the current speed of the robot. speed() takes no arguments, and returns the percent of speed, 0-100. Note that speed() may not always be the same as the last drive(), because of acceleration and deceleration.
         ///

@@ -81,6 +81,8 @@ namespace NetCoreRobots.Console
         }
         public void Display(Arena argArena)
         {
+            SetCursorPosition(mArenaR.p.x + mArenaR.s.w + 2, mArenaR.p.y);
+            Write($"{argArena.GetTime():n2}    ");
             CalcRobotsPos(argArena);
             CleanRobotsScreen();
             DisplatRobots();
@@ -98,7 +100,7 @@ namespace NetCoreRobots.Console
 
             SetCursorPosition(0, 0);
             WriteLine(mField1);
-            for (var y = 1; y < mArenaR.s.h; y++)
+            for (var y = 1; y <= mArenaR.s.h; y++)
             {
                 Write('│');
                 SetCursorPosition(pW1, y);

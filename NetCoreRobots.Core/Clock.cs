@@ -45,17 +45,17 @@ namespace NetCoreRobots.Core
         private long mTicksStartGame;
         private long? mTicksLastUpdate;
 
-        public double Speed { get; set; } = 10;
+        public double Speed { get; set; } = 1;
 
         public double Elapsed { get; private set; } // s
-        public double ElapsedGame => GetElapsedSeconds(Ticks, mTicksStartGame);  // s
+        public double ElapsedGame => GetElapsedSeconds(mTicksStartGame, Ticks);  // s
 
         public void StartGame() => mTicksStartGame = Ticks;
         public void StartUpdate()
         {
             var pTicks = Ticks;
 
-            Elapsed = (mTicksLastUpdate.HasValue) ? GetElapsedSeconds(pTicks, mTicksLastUpdate.Value) : 0;
+            Elapsed = (mTicksLastUpdate.HasValue) ? GetElapsedSeconds(mTicksLastUpdate.Value, pTicks) : 0;
             mTicksLastUpdate = pTicks;
         }
 
